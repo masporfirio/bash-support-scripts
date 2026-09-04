@@ -1,145 +1,93 @@
-# 🛠️ Bash Support Scripts
+# Bash Support Scripts
 
-Collection of simple and practical Bash scripts for common Linux / IT Support tasks.
+Small Bash scripts created while practicing Linux administration and IT support tasks.
 
-These scripts simulate real-world sysadmin and support scenarios, focusing on automation, troubleshooting, and system maintenance.
+The scripts are intentionally simple. They help me practice arguments, exit codes, command checks, file tests and basic error handling without hiding the Linux commands underneath.
 
----
+## Scripts
 
-## 📂 Scripts
+| Script | Purpose |
+| --- | --- |
+| [`disk_usage_report.sh`](scripts/disk_usage_report.sh) | Shows filesystem use and the largest entries in a directory. |
+| [`service_status.sh`](scripts/service_status.sh) | Displays a systemd service status and its recent journal entries. |
+| [`log_search.sh`](scripts/log_search.sh) | Searches a readable text log for a keyword. |
+| [`network_check.sh`](scripts/network_check.sh) | Performs a small IP connectivity and name-resolution check. |
+| [`backup_home_simple.sh`](scripts/backup_home_simple.sh) | Creates a timestamped archive of a chosen directory. |
 
-### 📊 disk_usage_report.sh
-Generates a disk usage report using `df` and `du`.
+## Disk usage report
 
-👉 Skills:
-- Disk analysis
-- Storage monitoring
+**What it does:** runs `df` for a target directory and uses `du` to list its largest entries one level below it.
 
----
-
-### 🔍 log_search.sh
-Searches logs for specific keywords or errors.
-
-👉 Skills:
-- Log analysis
-- Troubleshooting
-
----
-
-### ⚙️ service_status.sh
-
-Checks the status of a systemd service and displays recent logs for troubleshooting.
-
-👉 Skills:
-- Service management (systemctl)
-- Log analysis (journalctl)
-- Troubleshooting
-
-### Usage
+**What I practiced:** positional arguments, directory checks, pipelines and the difference between filesystem usage and directory usage.
 
 ```bash
-./service_status.sh ssh
+./scripts/disk_usage_report.sh /var/log
 ```
 
-### Example Output
+If no directory is supplied, the script checks the current directory.
+
+**Limitations:** this is a report only. It does not remove files or decide what is safe to delete. Permission errors from `du` are hidden, so the list may be incomplete.
+
+## Service status
+
+**What it does:** combines `systemctl status` with the last 30 journal entries for one service.
+
+**What I practiced:** validating required commands, accepting a service name and preserving the status returned by `systemctl`.
 
 ```bash
-Checking status for service: ssh
-● ssh.service - OpenBSD Secure Shell server
-     Loaded: loaded (/lib/systemd/system/ssh.service; enabled; vendor preset: enabled)
-     Active: active (running) since Thu 2026-04-23 18:11:26 PDT; 31min ago
-       Docs: man:sshd(8)
-             man:sshd_config(5)
-    Process: 513 ExecStartPre=/usr/sbin/sshd -t (code=exited, status=0/SUCCESS)
-   Main PID: 547 (sshd)
-      Tasks: 1 (limit: 2250)
-     Memory: 3.3M
-        CPU: 13ms
-     CGroup: /system.slice/ssh.service
-             └─547 sshd: /usr/sbin/sshd -D [listener] 0 of 10-100 startups
-
-Warning: some journal files were not opened due to insufficient permissions.
-Recent logs:
-Hint: You are currently not seeing messages from other users and the system.
-      Users in groups 'adm', 'systemd-journal' can see all messages.
-      Pass -q to turn off this notice.
--- Journal begins at Sun 2022-09-25 15:20:34 PDT, ends at Thu 2026-04-23 18:42:27 PDT. --
--- No entries --
+./scripts/service_status.sh ssh
 ```
 
----
+**Limitations:** it requires a systemd-based Linux system. Journal access depends on the current user's permissions, and the script does not attempt to restart or reconfigure the service.
 
-### 💾 backup_home_simple.sh
-Creates a compressed backup of the user's home directory, stores logs, checks for errors, and removes backups older than 7 days.
+## Log search
 
-👉 Skills:
-- Backup automation
-- Log management
-- Cron job readiness
+**What it does:** searches a readable text file with case-insensitive line numbers and reports the match count.
 
----
-
-## 🚀 Usage
-
-## 📄 Example Output
-
-### Running the backup script
+**What I practiced:** file tests, default arguments, `grep` exit codes and quoting user input.
 
 ```bash
-$ ./backup_home_simple.shx *.sh
+./scripts/log_search.sh /var/log/syslog error
 ```
 
-###Log file output (~/backups/backup.log)
+The default keyword is `error` when the second argument is omitted.
+
+**Limitations:** it is intended for plain-text logs. It does not read compressed archives, binary logs or the systemd journal.
+
+## Network check
+
+**What it does:** shows the route table when `ip` is available, pings an IP target and checks a hostname with `getent`.
+
+**What I practiced:** separating basic IP connectivity from name resolution and collecting a meaningful exit status.
 
 ```bash
-[Thu 23 Apr 2026 06:19:15 PM PDT] Starting backup...
-tar: Removing leading `/' from member names
-[Thu 23 Apr 2026 06:19:18 PM PDT] Backup SUCCESS: /home/debian/backups/home_backup_2026-04-23_18-19-15.tar.gz
-[Thu 23 Apr 2026 06:19:18 PM PDT] Old backups removed.
+./scripts/network_check.sh 1.1.1.1 example.com
 ```
 
-###Backup file created
+For an offline test, the defaults use `127.0.0.1` and `localhost`.
+
+**Limitations:** ICMP may be blocked even when another protocol works. This is a first check, not a complete network diagnosis.
+
+## Simple directory backup
+
+**What it does:** creates a timestamped `.tar.gz` archive and writes a small log next to the archive.
+
+**What I practiced:** path validation, timestamps, command success checks and safer defaults. The script refuses to archive `/` and refuses to place the destination inside the source.
 
 ```bash
-/home/debian/backups
+./scripts/backup_home_simple.sh "$HOME/Documents" "$HOME/backups"
 ```
 
-###Checking the backup directory
+When the destination is omitted, it uses `$HOME/backups`.
+
+**Limitations:** it does not encrypt, upload, rotate or verify the archive after creation. A real backup plan also needs a separate copy and a restore test.
+
+## Validation
+
+All scripts can be checked without running them:
 
 ```bash
-$ ls -lh ~/backups
-total 85448
--rw-r--r-- 1 debian debian      262 Apr 23 18:19 backup.log
--rw-r--r-- 1 debian debian 87493402 Apr 23 18:19 home_backup_2026-04-23_18-19-15.tar.gz
+bash -n scripts/*.sh
 ```
 
----
-
-🧠 What This Project Demonstrates
-
-* Linux command-line proficiency
-* Bash scripting fundamentals
-* System troubleshooting mindset
-* Automation of routine tasks
-* Real-world IT Support scenarios
-
----
-
-🔧 Possible Improvements
-
-* Add parameter support (e.g., custom directories)
-* Implement remote backups (rsync / scp)
-* Add email notifications
-* Integrate with cron jobs
-* Improve error handling
-
----
-
-📌 Author
-
-Marcelo Porfirio  
-Junior Linux / IT Support  
-
-Focused on Linux system administration, troubleshooting, and automation.  
-Currently preparing for LPIC-102 certification.
-
+I also run the non-destructive scripts with test inputs before committing changes. `shellcheck` is useful for an additional review when it is installed.
