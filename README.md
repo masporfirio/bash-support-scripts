@@ -13,6 +13,7 @@ The scripts are intentionally simple. They help me practice arguments, exit code
 | [`log_search.sh`](scripts/log_search.sh) | Searches a readable text log for a keyword. |
 | [`network_check.sh`](scripts/network_check.sh) | Performs a small IP connectivity and name-resolution check. |
 | [`backup_home_simple.sh`](scripts/backup_home_simple.sh) | Creates a timestamped archive of a chosen directory. |
+| [`system_info.sh`](scripts/system_info.sh) | Reports disk space, memory use, network interfaces and routes on Linux or macOS. |
 
 ## Disk usage report
 
@@ -82,12 +83,27 @@ When the destination is omitted, it uses `$HOME/backups`.
 
 **Limitations:** it does not encrypt, upload, rotate or verify the archive after creation. A real backup plan also needs a separate copy and a restore test.
 
+## System information study lab
+
+**What it does:** combines a read-only disk, memory and network report, selecting commands for Linux or macOS. It does not send network probes.
+
+```bash
+bash scripts/system_info.sh
+```
+
+- [Study guide: commands and concepts](docs/system-info-study-guide.md)
+- [Hands-on lab: collect and interpret system information](labs/system-info/README.md)
+
+**Validation:** Bash syntax and native macOS execution were checked on 2026-11-10. Disk, memory, interfaces and the default gateway were present in the output. Native Linux execution remains pending. See the guide for dependencies and error-handling limitations.
+
 ## Validation
 
 All scripts can be checked without running them:
 
 ```bash
-bash -n scripts/*.sh
+for script in scripts/*.sh; do
+  bash -n "$script" || break
+done
 ```
 
 I also run the non-destructive scripts with test inputs before committing changes. `shellcheck` is useful for an additional review when it is installed.
