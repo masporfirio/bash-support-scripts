@@ -145,8 +145,13 @@ An isolated machine may legitimately have no default route.
   `PhysMem` line, network interfaces and a default gateway were present.
 - The initial restricted execution blocked `top` and `route`. Running outside
   that restriction allowed the queries to be verified.
-- Native Linux execution: pending. Linux support is implemented but has not
-  yet been demonstrated by an execution on that platform.
+- Native Linux execution: passed on Debian GNU/Linux 12 (bookworm, aarch64),
+  running Xfce in UTM. The published script passed SHA-256 verification and Bash
+  syntax checking, returned exit status zero, produced no standard-error output,
+  and displayed disk space, RAM, swap, interfaces and a default route.
+- See the [validation record](system-info-validation.md) for the tested revision,
+  checks and observed Debian results. These results cover the tested
+  environments and do not establish compatibility with every Linux distribution.
 - Student execution and learning assessment: pending. Publishing the material
   does not establish that the student has completed the lab.
 

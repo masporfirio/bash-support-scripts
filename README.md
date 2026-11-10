@@ -94,7 +94,7 @@ bash scripts/system_info.sh
 - [Study guide: commands and concepts](docs/system-info-study-guide.md)
 - [Hands-on lab: collect and interpret system information](labs/system-info/README.md)
 
-**Validation:** Bash syntax and native macOS execution were checked on 2026-11-10. Disk, memory, interfaces and the default gateway were present in the output. Native Linux execution remains pending. See the guide for dependencies and error-handling limitations.
+**Validation:** Passed on Debian GNU/Linux 12 (bookworm, aarch64, Xfce in UTM) and macOS on 2026-11-10. Both executions returned status zero and produced disk, memory, interface and default-route information. See the [validation record](docs/system-info-validation.md) for evidence and the guide for dependencies and error-handling limitations.
 
 ## Validation
 
